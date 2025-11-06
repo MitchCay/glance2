@@ -73,8 +73,15 @@ async def file_upload(file: UploadFile):
         import pandas as pd
 
         df = pd.read_csv(file.file)
+        print(df)
 
         return df.head().to_dict()
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/test-route")
+def test_route(request: Request):
+    user_id = authenticate_and_get_user_details(request)
+    return {"user_id": user_id}

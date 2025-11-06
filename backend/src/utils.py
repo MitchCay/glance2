@@ -15,8 +15,10 @@ def authenticate_and_get_user_details(request) -> str:
             AuthenticateRequestOptions(
                 authorized_parties=["http://localhost:5173", "http://localhost:5174"],
                 jwt_key=os.getenv("JWT_KEY"),
+                clock_skew_in_ms=100000,  # TODO: resolve clock skew issue on computer and remove
             ),
         )
+        print(request_state)
         if not request_state.is_signed_in:
             raise HTTPException(status_code=401, detail="Invalid Token")
 

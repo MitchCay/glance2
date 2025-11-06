@@ -12,21 +12,29 @@ export function Dashboard() {
     const formData = new FormData();
     formData.append("file", file);
 
+    
+
     // const response = await makeRequest("create-transactions", {
     //   method: "POST",
     //   body: formData
     // })
 
-    // test a "hello world" endpoint
-    const response = await makeRequest("hello-world") 
+    // test a "uploadfile" endpoint
+    const response = await makeRequest("transactions/uploadfile",{
+      method: "POST",
+      body: formData
+    })
 
-    const result = await response.json()
-
-    console.log(result)
-
+    console.log(response)
   };
 
+  const testRoute = async () => {
+    const response = await makeRequest("transactions/test-route")
+    console.log(response)
+  }
+
   return (
+    <div>
     <form onSubmit={handleSubmit}>
       <input
         type="file"
@@ -50,5 +58,9 @@ export function Dashboard() {
         </button>
       )}
     </form>
+    <button onClick={testRoute}>
+      /test-route
+    </button>
+    </div>
   );
 }
