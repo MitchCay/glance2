@@ -9,8 +9,10 @@ dependencies = [
     "fastapi>=0.119.1",
     "fastapi-swagger-dark>=0.0.7",
     "pandas>=2.3.3",
+    "psycopg2>=2.9.11",
     "pydantic>=2.12.4",
     "python-dotenv>=1.1.1",
+    "python-multipart>=0.0.20",
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
 ]

@@ -3,6 +3,7 @@ import {useApi} from "../utils/api"
 
 export function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
+  const [responseString, setResponseString] = useState<string|null>(null);
   const makeRequest = useApi()
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +32,7 @@ export function Dashboard() {
   const testRoute = async () => {
     const response = await makeRequest("transactions/test-route")
     console.log(response)
+    setResponseString(response.user_id)
   }
 
   return (
@@ -58,9 +60,15 @@ export function Dashboard() {
         </button>
       )}
     </form>
+
+
+    
     <button onClick={testRoute}>
       /test-route
     </button>
+    {responseString && (
+      <p>{responseString}</p>
+    )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { Link, Navigate, Outlet } from "react-router-dom";
 export function Layout() {
   return (
     <div className="flex flex-col h-screen">
-      <header className="flex items-center justify-between w-screen px-10 py-2 bg-neutral-900">
+      <header className="flex items-center justify-between px-10 py-2 bg-neutral-900">
         <h1>Header</h1>
         <SignedIn>
           <nav className="space-x-5 flex">
