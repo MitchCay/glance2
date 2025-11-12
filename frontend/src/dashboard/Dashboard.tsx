@@ -12,13 +12,6 @@ export function Dashboard() {
     const formData = new FormData();
     formData.append("file", file);
 
-    
-
-    // const response = await makeRequest("create-transactions", {
-    //   method: "POST",
-    //   body: formData
-    // })
-
     // test a "uploadfile" endpoint
     const response = await makeRequest("transactions/uploadfile",{
       method: "POST",
