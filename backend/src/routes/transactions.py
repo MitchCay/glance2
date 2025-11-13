@@ -1,3 +1,4 @@
+from typing import Union
 from fastapi import (
     APIRouter,
     Depends,
@@ -82,6 +83,7 @@ async def file_upload(file: UploadFile):
 
 
 @router.get("/test-route")
-def test_route(request: Request):
+def test_route(request: Request, **kwargs):
     user_id = authenticate_and_get_user_details(request)
-    return {"user_id": user_id}
+    print(kwargs)
+    return {"user_id": user_id, "kwargs": kwargs}
