@@ -35,24 +35,25 @@ async def get_transactions(
     return transactions
 
 
-@router.post("/create-transactions")
+@router.post("/create-transaction")
 def create_transaction(
     request: Request,
     transaction_request: TransactionRequest,
     db: Session = Depends(get_db),
 ):
+    print(request)
     try:
-        user_id = "user_1"  # authenticate_and_get_user_details(request)
+        user_id = "user_2"  # authenticate_and_get_user_details(request)
 
-        new_transaction = add_transaction(
-            db=db,
-            amount=transaction_request.amount,
-            date=transaction_request.date,
-            user_id=user_id,
-            description=transaction_request.description,
-        )
+        # new_transaction = add_transaction(
+        #     db=db,
+        #     amount=transaction_request.amount,
+        #     date=transaction_request.date,
+        #     user_id=user_id,
+        #     description=transaction_request.description,
+        # )
 
-        return new_transaction
+        # return new_transaction
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -70,14 +71,6 @@ async def file_upload(file: UploadFile):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
-def get_start_date():
-    return date.today() - timedelta(30)
-
-
-def get_end_date():
-    return datetime.now()
 
 
 @router.get("/test-route")

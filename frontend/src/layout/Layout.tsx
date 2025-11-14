@@ -9,6 +9,7 @@ export function Layout() {
         <SignedIn>
           <nav className="space-x-5 flex">
             <Link to="/">Dashboard</Link>
+            <Link to="/edit-transactions">Edit Transactions</Link>
             <Link to="/history">Transaction History</Link>
             <UserButton />
           </nav>

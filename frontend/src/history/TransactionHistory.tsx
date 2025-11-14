@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../utils/api";
+import { formatISODate } from "../utils/utils";
 
 type Transaction = {
   id: number;
@@ -8,8 +9,6 @@ type Transaction = {
   user_id: string;
   description: string;
 };
-
-const formatISODate = (d: Date) => d.toISOString().split("T")[0];
 
 export const TransactionHistory = () => {
   const [transactions, setTrasactions] = useState<Transaction[]>([]);
