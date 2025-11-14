@@ -9,8 +9,6 @@ type Transaction = {
   description: string;
 };
 
-const isFullDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
-
 const formatISODate = (d: Date) => d.toISOString().split("T")[0];
 
 export const TransactionHistory = () => {
@@ -24,15 +22,8 @@ export const TransactionHistory = () => {
   const thirtyDaysBefore = new Date();
   thirtyDaysBefore.setDate(end.getDate() - 30);
 
-  // full dates driving fetch
   const [endDate, setEndDate] = useState<string>(formatISODate(end));
   const [startDate, setStartDate] = useState<string>(
-    formatISODate(thirtyDaysBefore)
-  );
-
-  // pending (partial) dates - controlled input values
-  const [pendingEnd, setPendingEnd] = useState<string>(formatISODate(end));
-  const [pendingStart, setPendingStart] = useState<string>(
     formatISODate(thirtyDaysBefore)
   );
 
@@ -55,31 +46,14 @@ export const TransactionHistory = () => {
   }, [startDate, endDate]);
 
   // When endDate changes, automatically reset startDate to 30 days before.
-  // Only commit end date changes when a full date is selected
   const handleEndDateChange = (value: string) => {
-    setPendingEnd(value);
-    if (!isFullDate(value)) return;
+    setEndDate(value);
 
     const newEnd = new Date(value);
     const newStart = new Date(newEnd);
     newStart.setDate(newEnd.getDate() - 30);
 
-    const committedEnd = formatISODate(newEnd);
-    const committedStart = formatISODate(newStart);
-
-    setEndDate(committedEnd);
-
-    // Only auto-backfill start if user hasn't manually overridden to something else
-    // Strategy: snap to 30 days prior unless pendingStart differs from committed startDate
-    // If you want to ALWAYS snap, remove the check and set both every time.
-    setStartDate(committedStart);
-    setPendingStart(committedStart);
-  };
-
-  // only commit start date changes when a full date is selected
-  const handleStartDateChange = (value: string) => {
-    setPendingStart(value);
-    if (isFullDate(value)) setStartDate(value);
+    setStartDate(formatISODate(newStart));
   };
 
   if (loading) return <p>Loading transactions...</p>;
@@ -93,9 +67,9 @@ export const TransactionHistory = () => {
           Start Date:{" "}
           <input
             type="date"
-            value={pendingStart}
+            value={startDate}
             onChange={(e) => {
-              if (e.target.value) handleStartDateChange(e.target.value);
+              if (e.target.value) setStartDate(e.target.value);
             }}
           />
         </label>
@@ -103,7 +77,7 @@ export const TransactionHistory = () => {
           End Date:{" "}
           <input
             type="date"
-            value={pendingEnd}
+            value={endDate}
             onChange={(e) => {
               if (e.target.value) handleEndDateChange(e.target.value);
             }}
