@@ -27,23 +27,35 @@ export const TransactionHistory = () => {
     formatISODate(thirtyDaysBefore)
   );
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoading(true);
-      try {
-        const response = await makeRequest(
-          `transactions/get-transactions?start_date=${startDate}&end_date=${endDate}`
-        );
-        const data: Transaction[] = await response.json();
-        setTrasactions(data);
-      } catch (err: any) {
+  const fetchTransactions = async (
+    startDate: string,
+    endDate: string,
+    retry = true
+  ) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await makeRequest(
+        `transactions/get-transactions?start_date=${startDate}&end_date=${endDate}`
+      );
+      const data: Transaction[] = await response.json();
+      setTrasactions(data);
+    } catch (err: any) {
+      if (!retry) {
+        console.warn("Initial fetch failed, retrying once....");
+        await fetchTransactions(startDate, endDate, false);
+      } else {
         setError(err.message);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchTransactions();
-  }, [startDate, endDate]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions(startDate, endDate);
+  }, []);
 
   if (loading) return <p>Loading transactions...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -80,6 +92,9 @@ export const TransactionHistory = () => {
             }}
           />
         </label>
+        <button onClick={() => fetchTransactions(startDate, endDate, false)}>
+          Fetch Transactions
+        </button>
       </div>
 
       {/* Transactions table */}
