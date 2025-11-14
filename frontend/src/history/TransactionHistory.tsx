@@ -45,17 +45,6 @@ export const TransactionHistory = () => {
     fetchTransactions();
   }, [startDate, endDate]);
 
-  // When endDate changes, automatically reset startDate to 30 days before.
-  const handleEndDateChange = (value: string) => {
-    setEndDate(value);
-
-    const newEnd = new Date(value);
-    const newStart = new Date(newEnd);
-    newStart.setDate(newEnd.getDate() - 30);
-
-    setStartDate(formatISODate(newStart));
-  };
-
   if (loading) return <p>Loading transactions...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -67,8 +56,8 @@ export const TransactionHistory = () => {
           Start Date:{" "}
           <input
             type="date"
-            value={startDate}
-            onChange={(e) => {
+            defaultValue={startDate}
+            onBlur={(e) => {
               if (e.target.value) setStartDate(e.target.value);
             }}
           />
@@ -77,9 +66,17 @@ export const TransactionHistory = () => {
           End Date:{" "}
           <input
             type="date"
-            value={endDate}
-            onChange={(e) => {
-              if (e.target.value) handleEndDateChange(e.target.value);
+            defaultValue={endDate}
+            onBlur={(e) => {
+              if (e.target.value) {
+                setEndDate(e.target.value);
+
+                const newEnd = new Date(e.target.value);
+                const newStart = new Date(newEnd);
+                newStart.setDate(newEnd.getDate() - 30);
+
+                setStartDate(formatISODate(newStart));
+              }
             }}
           />
         </label>
