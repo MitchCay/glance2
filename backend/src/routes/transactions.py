@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, date
 from typing import Union
 from fastapi import (
     APIRouter,
@@ -16,21 +17,32 @@ router = APIRouter()
 
 
 @router.get("/get-transactions")
-async def get_transactions(request: Request, db: Session = Depends(get_db)):
-    user_id = authenticate_and_get_user_details(request)
+async def get_transactions(
+    request: Request,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    db: Session = Depends(get_db),
+):
+    user_id = "user_1"  # authenticate_and_get_user_details(request)
 
-    transactions = get_user_transactions(db, user_id)
+    if end_date is None:
+        end_date = datetime.now()
+
+    if start_date is None:
+        start_date = end_date - timedelta(30)
+
+    transactions = get_user_transactions(db, user_id, start_date, end_date)
     return transactions
 
 
 @router.post("/create-transactions")
-async def create_transaction(
+def create_transaction(
     request: Request,
     transaction_request: TransactionRequest,
     db: Session = Depends(get_db),
 ):
     try:
-        user_id = authenticate_and_get_user_details(request)
+        user_id = "user_1"  # authenticate_and_get_user_details(request)
 
         new_transaction = add_transaction(
             db=db,
@@ -60,8 +72,28 @@ async def file_upload(file: UploadFile):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+def get_start_date():
+    return date.today() - timedelta(30)
+
+
+def get_end_date():
+    return datetime.now()
+
+
 @router.get("/test-route")
-def test_route(request: Request, **kwargs):
+def test_route(
+    request: Request,
+    start_date: datetime | None = None,
+    end_date: Union[datetime, None] = None,
+):
     user_id = authenticate_and_get_user_details(request)
-    print(kwargs)
-    return {"user_id": user_id, "kwargs": kwargs}
+
+    if start_date is None:
+        start_date = datetime.now()
+
+    if end_date is None:
+        end_date = start_date - timedelta(30)
+
+    print(end_date)
+
+    return {"start_date": start_date, "end_date": end_date}

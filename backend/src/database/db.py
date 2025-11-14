@@ -4,10 +4,7 @@ from . import models
 
 
 def get_user_transactions(
-        db: Session, 
-        user_id: str, 
-        start_date: datetime = datetime.now() - timedelta(30),
-        end_date: datetime = datetime.now()
+    db: Session, user_id: str, start_date: datetime, end_date: datetime
 ):
     return (
         db.query(models.Transactions)

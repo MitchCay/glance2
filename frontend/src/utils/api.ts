@@ -23,7 +23,7 @@ export const useApi = () => {
       throw new Error(errorData?.detail || "An error occurred");
     }
 
-    return response.json();
+    return response;
   };
 
   return makeRequest;

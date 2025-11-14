@@ -1,38 +1,153 @@
 import { useEffect, useState } from "react";
-import {useApi} from "../utils/api"
+import { useApi } from "../utils/api";
 
-type Transactions = {
-  id: Number;
-  amount: Number;
-  date: Date;
-  user_id: String;
-  description: String;
+type Transaction = {
+  id: number;
+  amount: number;
+  date: string;
+  user_id: string;
+  description: string;
 };
 
-type TransactionData = {
-  transactions: Transactions | null;
-};
+const isFullDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
 
-export function TransactionHistory() {
-  const [transactions, setTrasactions] = useState<TransactionData>()
-  const makeRequest = useApi()
+const formatISODate = (d: Date) => d.toISOString().split("T")[0];
+
+export const TransactionHistory = () => {
+  const [transactions, setTrasactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const makeRequest = useApi();
+
+  // default dates: end = today, start = 30 days before
+  const end = new Date();
+  const thirtyDaysBefore = new Date();
+  thirtyDaysBefore.setDate(end.getDate() - 30);
+
+  // full dates driving fetch
+  const [endDate, setEndDate] = useState<string>(formatISODate(end));
+  const [startDate, setStartDate] = useState<string>(
+    formatISODate(thirtyDaysBefore)
+  );
+
+  // pending (partial) dates - controlled input values
+  const [pendingEnd, setPendingEnd] = useState<string>(formatISODate(end));
+  const [pendingStart, setPendingStart] = useState<string>(
+    formatISODate(thirtyDaysBefore)
+  );
 
   useEffect(() => {
-    fetchTransactions()
-  }, [])
+    const fetchTransactions = async () => {
+      setLoading(true);
+      try {
+        const response = await makeRequest(
+          `transactions/get-transactions?start_date=${startDate}&end_date=${endDate}`
+        );
+        const data: Transaction[] = await response.json();
+        setTrasactions(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransactions();
+  }, [startDate, endDate]);
 
-  const fetchTransactions = async () => {
-    try {
-      const data = await makeRequest("transactions")
-      setTrasactions(data)
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  // When endDate changes, automatically reset startDate to 30 days before.
+  // Only commit end date changes when a full date is selected
+  const handleEndDateChange = (value: string) => {
+    setPendingEnd(value);
+    if (!isFullDate(value)) return;
+
+    const newEnd = new Date(value);
+    const newStart = new Date(newEnd);
+    newStart.setDate(newEnd.getDate() - 30);
+
+    const committedEnd = formatISODate(newEnd);
+    const committedStart = formatISODate(newStart);
+
+    setEndDate(committedEnd);
+
+    // Only auto-backfill start if user hasn't manually overridden to something else
+    // Strategy: snap to 30 days prior unless pendingStart differs from committed startDate
+    // If you want to ALWAYS snap, remove the check and set both every time.
+    setStartDate(committedStart);
+    setPendingStart(committedStart);
+  };
+
+  // only commit start date changes when a full date is selected
+  const handleStartDateChange = (value: string) => {
+    setPendingStart(value);
+    if (isFullDate(value)) setStartDate(value);
+  };
+
+  if (loading) return <p>Loading transactions...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div>
-        {transactions?.transactions?.user_id || "none"}
+      {/* Date selectors */}
+      <div style={{ marginBottom: "1rem" }}>
+        <label>
+          Start Date:{" "}
+          <input
+            type="date"
+            value={pendingStart}
+            onChange={(e) => {
+              if (e.target.value) handleStartDateChange(e.target.value);
+            }}
+          />
+        </label>
+        <label style={{ marginLeft: "1rem" }}>
+          End Date:{" "}
+          <input
+            type="date"
+            value={pendingEnd}
+            onChange={(e) => {
+              if (e.target.value) handleEndDateChange(e.target.value);
+            }}
+          />
+        </label>
+      </div>
+
+      {/* Transactions table */}
+      <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <thead>
+          <tr>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>ID</th>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>Amount</th>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>Date</th>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>
+              User ID
+            </th>
+            <th style={{ border: "1px solid #ccc", padding: "8px" }}>
+              Description
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((tx) => (
+            <tr key={tx.id}>
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                {tx.id}
+              </td>
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                ${tx.amount.toFixed(2)}
+              </td>
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                {new Date(tx.date).toLocaleDateString()}
+              </td>
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                {tx.user_id}
+              </td>
+              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                {tx.description}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};

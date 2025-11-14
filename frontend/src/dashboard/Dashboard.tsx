@@ -25,7 +25,7 @@ export function Dashboard() {
   const testRoute = async () => {
     const response = await makeRequest("transactions/test-route?kwargs=there")
     console.log(response)
-    setResponseString(response.user_id)
+    setResponseString(response.start_date)
   }
 
   return (
