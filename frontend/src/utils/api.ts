@@ -7,7 +7,7 @@ export const useApi = () => {
     const token = await getToken();
     const defaultOptions = {
       headers: {
-        // "Content-Type": "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };

@@ -7,6 +7,7 @@ from fastapi import (
     Request,
     UploadFile,
 )
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from .transaction_models import TransactionRequest
 from ..database.db import get_user_transactions, add_transaction
@@ -73,20 +74,31 @@ async def file_upload(file: UploadFile):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/test-route")
-def test_route(
-    request: Request,
-    start_date: datetime | None = None,
-    end_date: Union[datetime, None] = None,
-):
-    user_id = authenticate_and_get_user_details(request)
+"""
+Test route
+"""
 
-    if start_date is None:
-        start_date = datetime.now()
 
-    if end_date is None:
-        end_date = start_date - timedelta(30)
+class TestClass(BaseModel):
+    amount: float
+    date: datetime
+    description: str | None = None
 
-    print(end_date)
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "amount": 123.45,
+                "date": "2025-11-12 00:00:00",
+                "description": "optional",
+            }
+        }
 
-    return {"start_date": start_date, "end_date": end_date}
+
+@router.post("/test-route")
+async def test_route(request: Request, test_request: TestClass):
+
+    data = request.headers
+    print(data)
+    print(test_request)
+
+    return {"Content": test_request}

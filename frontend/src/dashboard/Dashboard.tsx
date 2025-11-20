@@ -23,11 +23,18 @@ export const Dashboard = () => {
   };
 
   const testRoute = async () => {
-    await makeRequest("transactions/test-route?kwargs=there")
+    await fetch("http://localhost:8000/transactions/test-route", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: 40,
+        date: "2025-11-20",
+        description: "hello",
+      }),
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setResponseString(data.start_date);
       });
   };
 

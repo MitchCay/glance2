@@ -3,7 +3,7 @@ import { useApi } from "../utils/api";
 import { formatISODate } from "../utils/utils";
 
 type Transaction = {
-  amount: number;
+  amount: string;
   date: string;
   description?: string;
 };
@@ -12,7 +12,7 @@ export const EditTransactions = () => {
   const makeRequest = useApi();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<Transaction>({
-    amount: 0,
+    amount: "",
     date: "",
     description: "",
   });
@@ -21,7 +21,7 @@ export const EditTransactions = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "amount" ? parseFloat(value) : value,
+      [name]: value,
     }));
   };
 
@@ -43,7 +43,7 @@ export const EditTransactions = () => {
         .then((response) => response.json())
         .then((data) => console.log(data));
       setShowForm(false);
-      setFormData({ amount: 0, date: "", description: "" });
+      setFormData({ amount: "", date: "", description: "" });
     } catch (error) {
       console.error("Failed to submit transaction:", error);
     }
