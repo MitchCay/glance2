@@ -1,12 +1,10 @@
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import { Link, Navigate, Outlet } from "react-router-dom";
-import { ModeToggle } from "../components/mode-toggle";
 
 export function Layout() {
   return (
     <div className="flex flex-col h-screen">
       <header className="flex w-screen max-w-300 items-center justify-between px-10 py-2 bg-neutral-900">
-        <ModeToggle />
         <h1>Header</h1>
         <SignedIn>
           <nav className="space-x-5 flex">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useApi } from "../lib/api";
+import { useApi } from "../utils/api";
 
 export const Dashboard = () => {
   const [file, setFile] = useState<File | null>(null);

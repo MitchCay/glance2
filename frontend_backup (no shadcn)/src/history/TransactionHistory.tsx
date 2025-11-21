@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useApi } from "../lib/api";
-import { formatISODate } from "../lib/utils";
+import { useApi } from "../utils/api";
+import { formatISODate } from "../utils/utils";
 
 type Transaction = {
   id: number;
