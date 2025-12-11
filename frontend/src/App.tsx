@@ -1,12 +1,11 @@
-import "./App.css";
-import ClerkProviderWithRoutes from "./auth/ClerkProviderWithRoutes";
+import "@/App.css";
+import ClerkProviderWithRoutes from "@/auth/ClerkProviderWithRoutes";
 import { Route, Routes } from "react-router-dom";
-import { AuthenticationPage } from "./auth/AuthenticationPage";
-import { Layout } from "./layout/Layout";
-import { Dashboard } from "./dashboard/Dashboard";
-import { TransactionHistory } from "./history/TransactionHistory";
-import { EditTransactions } from "./edit-transactions/EditTransactions";
-import { ThemeProvider } from "./components/theme-provider";
+import { AuthenticationPage } from "@/auth/AuthenticationPage";
+import { Layout } from "@/layout/Layout";
+import { Dashboard } from "@/dashboard/Dashboard";
+import { TransactionHistory } from "@/history/TransactionHistory";
+import { ThemeProvider } from "@/components/theme-provider";
 
 function App() {
   return (
@@ -18,10 +17,6 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/history" element={<TransactionHistory />} />
-            <Route
-              path="/edit-transactions"
-              element={<EditTransactions />}
-            ></Route>
           </Route>
         </Routes>
       </ClerkProviderWithRoutes>
