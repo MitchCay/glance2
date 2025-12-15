@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -22,7 +22,7 @@ class Transactions(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True)
-    amount = Column(Float, nullable=False)
+    amount = Column(Integer, nullable=False)
     date = Column(DateTime, nullable=False)
     user_id = Column(String, nullable=False)
     description = Column(String, nullable=True)

@@ -24,13 +24,16 @@ async def get_transactions(
     end_date: datetime | None = None,
     db: Session = Depends(get_db),
 ):
-    user_id = "user_1"  # authenticate_and_get_user_details(request)
+    # user_id = authenticate_and_get_user_details(request)
+    user_id = "user_2"
 
     if end_date is None:
         end_date = datetime.now()
 
     if start_date is None:
         start_date = end_date - timedelta(30)
+
+    print(start_date, end_date)
 
     transactions = get_user_transactions(db, user_id, start_date, end_date)
     return transactions
@@ -42,19 +45,20 @@ def create_transaction(
     transaction_request: TransactionRequest,
     db: Session = Depends(get_db),
 ):
-    print(request)
+    print(request.headers)
     try:
-        user_id = "user_2"  # authenticate_and_get_user_details(request)
+        # user_id = authenticate_and_get_user_details(request)
+        user_id = "user_2"
 
-        # new_transaction = add_transaction(
-        #     db=db,
-        #     amount=transaction_request.amount,
-        #     date=transaction_request.date,
-        #     user_id=user_id,
-        #     description=transaction_request.description,
-        # )
+        new_transaction = add_transaction(
+            db=db,
+            amount=transaction_request.amountCents,
+            date=transaction_request.date,
+            user_id=user_id,
+            description=transaction_request.description,
+        )
 
-        # return new_transaction
+        return new_transaction
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -80,7 +84,7 @@ Test route
 
 
 class TestClass(BaseModel):
-    amount: float
+    amountCents: int
     date: datetime
     description: str | None = None
 
@@ -99,6 +103,7 @@ async def test_route(request: Request, test_request: TestClass):
 
     data = request.headers
     print(data)
+    print("\n")
     print(test_request)
 
-    return {"Content": test_request}
+    return {"Content": test_request, "Success": "yeah boi"}

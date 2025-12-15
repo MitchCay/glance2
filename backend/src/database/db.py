@@ -16,7 +16,7 @@ def get_user_transactions(
 
 
 def add_transaction(
-    db: Session, amount: float, date: datetime, user_id: str, description: str | None
+    db: Session, amount: int, date: datetime, user_id: str, description: str | None
 ):
     db_transaction = models.Transactions(
         amount=amount, date=date, user_id=user_id, description=description

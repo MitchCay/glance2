@@ -34,6 +34,7 @@ export const Dashboard = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        setResponseString(JSON.stringify(data, null, 2));
         console.log(data);
       });
   };

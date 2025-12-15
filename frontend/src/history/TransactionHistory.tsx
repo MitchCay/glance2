@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
-import { formatISODate } from "@/lib/utils";
+import { formatISOForQuery } from "@/lib/utils";
 
 type Transaction = {
   id: number;
@@ -21,9 +21,11 @@ export const TransactionHistory = () => {
   const thirtyDaysBefore = new Date();
   thirtyDaysBefore.setDate(end.getDate() - 30);
 
-  const [endDate, setEndDate] = useState<string>(formatISODate(end));
+  console.log(formatISOForQuery(end));
+
+  const [endDate, setEndDate] = useState<string>(formatISOForQuery(end));
   const [startDate, setStartDate] = useState<string>(
-    formatISODate(thirtyDaysBefore)
+    formatISOForQuery(thirtyDaysBefore)
   );
 
   const fetchTransactions = async (
@@ -86,7 +88,7 @@ export const TransactionHistory = () => {
                 const newStart = new Date(newEnd);
                 newStart.setDate(newEnd.getDate() - 30);
 
-                setStartDate(formatISODate(newStart));
+                setStartDate(formatISOForQuery(newStart));
               }
             }}
           />
