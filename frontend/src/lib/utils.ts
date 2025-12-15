@@ -14,4 +14,5 @@ export const formatPythonISODate = (d: Date) =>
   d.toISOString().replace("Z", "+00:00");
 
 // Helper to produce an URL-encoded ISO datetime (e.g. "2025-11-11T21%3A51%3A07.209Z")
-export const formatISOForQuery = (d: Date) => encodeURIComponent(d.toISOString());
+export const formatISOForQuery = (d: Date) =>
+  encodeURIComponent(d.toISOString());
