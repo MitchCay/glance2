@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, date
-from typing import Union
+from typing import List, Union
 from fastapi import (
     APIRouter,
     Depends,
@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from .transaction_models import TransactionRequest
 from ..database.db import get_user_transactions, add_transaction
 from ..utils import authenticate_and_get_user_details
-from ..database.models import get_db
+from ..database.models import Transactions, get_db
 
 router = APIRouter()
 
@@ -24,8 +24,8 @@ async def get_transactions(
     end_date: datetime | None = None,
     db: Session = Depends(get_db),
 ):
-    # user_id = authenticate_and_get_user_details(request)
-    user_id = "user_2"
+    user_id = authenticate_and_get_user_details(request)
+    # user_id = "user_2"
 
     if end_date is None:
         end_date = datetime.now()
@@ -36,7 +36,18 @@ async def get_transactions(
     print(start_date, end_date)
 
     transactions = get_user_transactions(db, user_id, start_date, end_date)
-    return transactions
+    results = []
+    for tx in transactions:
+        results.append(
+            {
+                "id": tx.id,
+                "amount": tx.amount / 100.0,
+                "date": tx.date,
+                "userId": tx.user_id,
+                "description": tx.description,
+            }
+        )
+    return results
 
 
 @router.post("/create-transaction")
@@ -47,8 +58,8 @@ def create_transaction(
 ):
     print(request.headers)
     try:
-        # user_id = authenticate_and_get_user_details(request)
-        user_id = "user_2"
+        user_id = authenticate_and_get_user_details(request)
+        # user_id = "user_2"
 
         new_transaction = add_transaction(
             db=db,
