@@ -9,6 +9,7 @@ from fastapi import (
 )
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 from .transaction_models import TransactionRequest
 from ..database.db import get_user_transactions, add_transaction
 from ..utils import authenticate_and_get_user_details
@@ -76,7 +77,7 @@ def create_transaction(
 
 
 @router.post("/uploadfile")
-async def file_upload(file: UploadFile):
+async def upload_file(file: UploadFile):
     try:
         import pandas as pd
 
@@ -84,6 +85,15 @@ async def file_upload(file: UploadFile):
         print(df)
 
         return df.head().to_dict()
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/bulk-transaction-add")
+async def bulk_transaction_add(file: UploadFile):
+    try:
+        statement_processing(file)
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

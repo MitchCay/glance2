@@ -7,12 +7,9 @@ export const useApi = () => {
     const token = await getToken();
     const defaultOptions = {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };
-
-    console.log(options);
 
     const response = await fetch(`http://localhost:8000/${endpoint}`, {
       ...defaultOptions,

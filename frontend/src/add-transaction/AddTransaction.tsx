@@ -20,9 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { toast } from "sonner";
-import { useApi } from "@/lib/api";
-import { formatISODate, formatPythonISODate } from "@/lib/utils";
+import { formatPythonISODate } from "@/lib/utils";
 
 const schema = z.object({
   amount: z
@@ -69,29 +67,6 @@ export default function AddTransaction({
 
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const makeRequest = useApi();
-
-  const testRoute = async (payload: {
-    amountCents: number;
-    date: string;
-    description?: string | null;
-  }) => {
-    await makeRequest("transactions/create-transaction", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    })
-      // await fetch("http://localhost:8000/transactions/create-transaction", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(payload),
-      // })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        toast(JSON.stringify(data, null, 2));
-      });
-  };
-
   async function submit(values: FormValues) {
     const parsed = parseFloat(values.amount.replace(/[$,\s]/g, ""));
     const amountCents = Number.isFinite(parsed) ? Math.round(parsed * 100) : 0;
@@ -106,7 +81,6 @@ export default function AddTransaction({
     if (onSubmit) onSubmit(payload);
     else {
       console.log("AddTransaction submit:", payload);
-      await testRoute(payload);
     }
   }
 
