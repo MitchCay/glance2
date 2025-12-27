@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from clerk_backend_api import Clerk, AuthenticateRequestOptions
 import os
 from dotenv import load_dotenv
@@ -31,4 +31,40 @@ def authenticate_and_get_user_details(request) -> str:
         return user_id
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return "user_2"
+        # TODO: re-enable error raising after testing
+        # raise HTTPException(status_code=500, detail=str(e))
+
+
+def transform_lake_elmo_data(file: UploadFile) -> list[dict]:
+    import pandas as pd
+    import camelot
+
+    # Use Camelot to read tables from the PDF file
+    tables = camelot.read_pdf(file.file, flavor="stream", pages="1-end")
+
+    # combine all tables into a single DataFrame
+    camelot_df = pd.concat([table.df for table in tables], ignore_index=True)
+
+    # convert date columns to datetime
+    camelot_df[0] = pd.to_datetime(camelot_df[0], errors="coerce")
+    camelot_df.dropna(subset=[0], inplace=True, ignore_index=True)
+
+    # Convert last three columns to numeric
+    def currency_to_numeric(series):
+        # Remove $ and commas, strip spaces
+        cleaned = series.astype(str).str.replace(r"[\$,]", "", regex=True).str.strip()
+        # Convert to numeric, invalid parsing becomes NaN
+        return pd.to_numeric(cleaned, errors="coerce")
+
+    # Apply conversion
+    for col in camelot_df.columns[2:]:
+        camelot_df[col] = currency_to_numeric(camelot_df[col]).fillna(0)
+
+    # sum last three columns, convert to cents then drop the ones used to sum
+    camelot_df["amount"] = (camelot_df.iloc[:, 2:].sum(axis=1) * 100).astype(int)
+    camelot_df.drop(camelot_df.columns[[2, 3, 4]], axis=1, inplace=True)
+
+    # rename columns and return json-like format
+    camelot_df.columns = ["date", "description", "amount"]
+    return camelot_df.to_dict(orient="records")

@@ -18,7 +18,7 @@ engine = create_engine(
 Base = declarative_base()
 
 
-class Transactions(Base):
+class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True)

@@ -11,9 +11,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from .transaction_models import TransactionRequest
-from ..database.db import get_user_transactions, add_transaction
-from ..utils import authenticate_and_get_user_details
-from ..database.models import Transactions, get_db
+from ..database.db import bulk_add_transactions, get_user_transactions, add_transaction
+from ..utils import authenticate_and_get_user_details, transform_lake_elmo_data
+from ..database.models import Transaction, get_db
 
 router = APIRouter()
 
@@ -59,15 +59,17 @@ def create_transaction(
 ):
     print(request.headers)
     try:
-        user_id = authenticate_and_get_user_details(request)
-        # user_id = "user_2"
+
+        db_transaction = Transaction(
+            amount=transaction_request.amountCents,
+            date=transaction_request.date,
+            user_id=authenticate_and_get_user_details(request),
+            description=transaction_request.description,
+        )
 
         new_transaction = add_transaction(
             db=db,
-            amount=transaction_request.amountCents,
-            date=transaction_request.date,
-            user_id=user_id,
-            description=transaction_request.description,
+            db_transaction=db_transaction,
         )
 
         return new_transaction
@@ -91,10 +93,21 @@ async def upload_file(file: UploadFile):
 
 
 @router.post("/bulk-transaction-add")
-async def bulk_transaction_add(file: UploadFile):
+async def bulk_transaction_add(
+    request: Request,
+    file: UploadFile,
+    db: Session = Depends(get_db),
+):
     try:
-        statement_processing(file)
+        transactions = transform_lake_elmo_data(file)
+        db_transactions = [
+            Transaction(user_id=authenticate_and_get_user_details(request), **tx)
+            for tx in transactions
+        ]
 
+        trans = bulk_add_transactions(db, db_transactions)
+
+        return trans
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
