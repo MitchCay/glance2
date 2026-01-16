@@ -41,7 +41,7 @@ def transform_lake_elmo_data(file: UploadFile) -> list[dict]:
     import camelot
 
     # Use Camelot to read tables from the PDF file
-    tables = camelot.read_pdf(file.file, flavor="stream", pages="1-end")
+    tables = camelot.read_pdf(file.file, flavor="stream", pages="1-end")  # type: ignore
 
     # combine all tables into a single DataFrame
     camelot_df = pd.concat([table.df for table in tables], ignore_index=True)

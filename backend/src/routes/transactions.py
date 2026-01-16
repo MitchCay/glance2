@@ -11,7 +11,12 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from .transaction_models import TransactionRequest
-from ..database.db import bulk_add_transactions, get_user_transactions, add_transaction
+from ..database.db import (
+    bulk_add_transactions,
+    deduplicate_transactions,
+    get_user_transactions,
+    add_transaction,
+)
 from ..utils import authenticate_and_get_user_details, transform_lake_elmo_data
 from ..database.models import Transaction, get_db
 
@@ -26,7 +31,6 @@ async def get_transactions(
     db: Session = Depends(get_db),
 ):
     user_id = authenticate_and_get_user_details(request)
-    # user_id = "user_2"
 
     if end_date is None:
         end_date = datetime.now()
@@ -34,7 +38,8 @@ async def get_transactions(
     if start_date is None:
         start_date = end_date - timedelta(30)
 
-    print(start_date, end_date)
+    # Deduplicate transactions before fetching: Not sure this is the best place for it
+    deduplicate_transactions(db, user_id)
 
     transactions = get_user_transactions(db, user_id, start_date, end_date)
     results = []
@@ -48,6 +53,7 @@ async def get_transactions(
                 "description": tx.description,
             }
         )
+
     return results
 
 

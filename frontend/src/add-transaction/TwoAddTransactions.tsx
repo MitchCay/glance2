@@ -12,7 +12,9 @@ export default function TwoAddTransactions() {
     date: string;
     description?: string | null;
   }) {
+    console.log("Submitting single add with payload:", JSON.stringify(payload));
     await makeRequest("transactions/create-transaction", {
+      options: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify(payload),
     })

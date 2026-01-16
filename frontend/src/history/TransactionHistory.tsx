@@ -42,6 +42,7 @@ export const TransactionHistory = () => {
       );
       const data: Transaction[] = await response.json();
       setTrasactions(data);
+      console.log("Fetched transactions:", data);
     } catch (err: any) {
       if (!retry) {
         console.warn("Initial fetch failed, retrying once....");

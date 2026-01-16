@@ -78,8 +78,10 @@ export default function AddTransaction({
       date: dateIso,
       description: values.description ?? null,
     };
-    if (onSubmit) onSubmit(payload);
-    else {
+    if (onSubmit) {
+      console.log("AddTransaction submit:", payload);
+      onSubmit(payload);
+    } else {
       console.log("AddTransaction submit:", payload);
     }
   }
